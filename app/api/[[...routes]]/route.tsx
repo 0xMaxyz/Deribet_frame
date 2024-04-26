@@ -16,7 +16,8 @@ import { vars } from "./lib/ui";
 
 import {
   checkIfRecasted,
-  checkIsFollowingFrameCaster,
+  checkIsFollowingFrameCasterAirstack,
+  checkIsFollowingFrameCasterPinata,
   getTxhashOnExplorer,
   getWalletAddresses,
   isToday,
@@ -33,7 +34,7 @@ const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   browserLocation: "/",
-  //hub: pinata(),
+  hub: pinata(),
   ui: { vars },
 });
 
@@ -124,7 +125,9 @@ app.frame("/check", async (c) => {
 
   try {
     // Check if the user follows the frame author
-    isFollowing = await checkIsFollowingFrameCaster(frameData?.fid as number);
+    isFollowing = await checkIsFollowingFrameCasterPinata(
+      frameData?.fid as number
+    );
 
     // Check if the user recasted this frame
     isRecasted = await checkIfRecasted(

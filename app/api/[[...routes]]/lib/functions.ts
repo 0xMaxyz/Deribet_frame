@@ -10,7 +10,7 @@ export const log = function (message?: any, ...optionalParams: any[]) {
   }
 };
 
-export const checkIsFollowingFrameCaster = async function (
+export const checkIsFollowingFrameCasterAirstack = async function (
   _fid: number
 ): Promise<Boolean> {
   const query = `query {
@@ -42,6 +42,40 @@ export const checkIsFollowingFrameCaster = async function (
   } else {
     throw new Error("E1. Error retrieving data, please try again.");
   }
+};
+
+export const checkIsFollowingFrameCasterPinata = async function (
+  _fid: number
+): Promise<Boolean> {
+  const authorFid = process.env.FID as string;
+  let loop = true;
+  let nextPageToken = "";
+  const pageSize = "200";
+
+  while (loop) {
+    const resp = await fetch(
+      `https://hub.pinata.cloud/v1/linksByTargetFid?target_fid=${_fid}&link_type=follow&pageSize=${pageSize}&reverse=true&nextPageToken=${nextPageToken}`,
+      { method: "GET" }
+    );
+    // set next page token
+    const jresp = await resp.json();
+
+    // loop controller
+    if ((jresp.nextPageToken as string).length > 0) {
+      loop = true;
+      nextPageToken = jresp.nextPageToken as string;
+    } else {
+      // last page
+      loop = false;
+    }
+    // check if fid is in this list
+    for (const msg of jresp.messages) {
+      if (msg.data && msg.data.fid === authorFid) {
+        return true;
+      }
+    }
+  }
+  return false;
 };
 
 export const checkIfRecasted = async function (
