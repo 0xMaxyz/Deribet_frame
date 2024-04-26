@@ -1,6 +1,6 @@
 /** @jsxImportSource frog/jsx */
 
-import { Button, FrameResponse, Frog, TextInput } from "frog";
+import { Button, FrameResponse, Frog } from "frog";
 import { devtools } from "frog/dev";
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
@@ -24,7 +24,6 @@ import {
   log,
 } from "./lib/functions";
 import { transferToken } from "./lib/onchain";
-import { logger } from "hono/logger";
 
 dotenv.config();
 

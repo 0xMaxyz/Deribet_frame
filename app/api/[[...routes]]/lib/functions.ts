@@ -50,7 +50,7 @@ export const checkIsFollowingFrameCasterPinata = async function (
   const authorFid = process.env.FID as string;
   let loop = true;
   let nextPageToken = "";
-  const pageSize = "200";
+  const pageSize = "50";
 
   while (loop) {
     const resp = await fetch(
