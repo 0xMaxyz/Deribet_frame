@@ -31,12 +31,12 @@ export const getLatestTxTimestampForAUser = async function (
   _wallet: string
 ) {
   const resp = await sql`
-  SELECT timestamp
-  FROM Allocations
-  WHERE fid = '${_fid}' OR wallet_address = '${_wallet}'
-  ORDER BY timestamp DESC
-  LIMIT 1;
-`;
+    SELECT timestamp
+    FROM Allocations
+    WHERE fid = ${_fid.toString()} OR wallet_address = ${_wallet}
+    ORDER BY timestamp DESC
+    LIMIT 1;
+  `;
   return (resp.rows[0]?.timestamp as number) ?? 0;
 };
 
@@ -68,7 +68,7 @@ export const setClaimTimestamp = async function (
   );
   const result = await sql`
     INSERT INTO Allocations (timestamp, wallet_address, fid, amount_redeemed, tx_hash, token_address)
-    VALUES ('${_timestamp}', '${_wallet}', '${_fid}', '${_amount}', '${_tx_hash}', '${_tokenAddress}');
+    VALUES (${_timestamp}, ${_wallet}, ${_fid}, ${_amount}, ${_tx_hash}, ${_tokenAddress});
   `;
 
   log("Inserted Data: ", result);

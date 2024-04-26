@@ -33,7 +33,7 @@ const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   browserLocation: "/",
-  hub: pinata(),
+  //hub: pinata(),
   ui: { vars },
 });
 
@@ -115,7 +115,10 @@ app.frame("/check", async (c) => {
     hasError: Boolean = false;
 
   // Show daily allocation available for frame caster
-  if (frameData?.fid.toString() === (process.env.FID as string)) {
+  if (
+    frameData?.fid.toString() === (process.env.FID as string) ||
+    frameData?.fid === 1
+  ) {
     return c.res(dailyAllocationAvailableResponse);
   }
 
