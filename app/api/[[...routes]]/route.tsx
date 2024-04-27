@@ -124,8 +124,9 @@ app.frame("/check", async (c) => {
 
   try {
     // Check if the user follows the frame author
-    isFollowing = await checkIsFollowingFrameCasterAirstack(
-      frameData?.fid as number
+    isFollowing = await checkIsFollowingFrameCasterPinata(
+      frameData?.fid as number,
+      2000
     );
 
     // Check if the user recasted this frame
