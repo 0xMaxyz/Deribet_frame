@@ -57,7 +57,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src="/frame-welcome.png" />,
+  image: <img src="/frame-welcome_test.png" />,
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
@@ -124,7 +124,7 @@ app.frame("/check", async (c) => {
 
   try {
     // Check if the user follows the frame author
-    isFollowing = await checkIsFollowingFrameCasterPinata(
+    isFollowing = await checkIsFollowingFrameCasterAirstack(
       frameData?.fid as number
     );
 
