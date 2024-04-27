@@ -5,7 +5,7 @@ dotenv.config();
 
 init(process.env.AIRSTACK_API_KEY as string, "prod");
 
-async function timeoutHandler<T>(timeout: number, value: T): Promise<T> {
+export async function timeoutHandler<T>(timeout: number, value: T): Promise<T> {
   return new Promise<T>((resolve) => {
     setTimeout(() => {
       resolve(value);

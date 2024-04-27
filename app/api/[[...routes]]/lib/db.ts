@@ -30,6 +30,7 @@ export const getLatestTxTimestampForAUser = async function (
   _fid: number,
   _wallet: string
 ) {
+  log(`Check if ${_fid} with wallet address of ${_wallet} claimed today`);
   const resp = await sql`
     SELECT timestamp
     FROM Allocations
@@ -37,7 +38,8 @@ export const getLatestTxTimestampForAUser = async function (
     ORDER BY timestamp DESC
     LIMIT 1;
   `;
-  return (resp.rows[0]?.timestamp as number) ?? 0;
+  log("Db result:", resp.rows[0]);
+  return (resp.rows[0]?.timestamp as string) ?? "";
 };
 
 export const getLatestTxHashForAUser = async function (
