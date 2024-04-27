@@ -2,7 +2,16 @@ import dotenv from "dotenv";
 import { init, fetchQuery } from "@airstack/node";
 
 dotenv.config();
+
 init(process.env.AIRSTACK_API_KEY as string, "prod");
+
+async function timeoutHandler<T>(timeout: number, value: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    setTimeout(() => {
+      resolve(value);
+    }, timeout);
+  });
+}
 
 export const log = function (message?: any, ...optionalParams: any[]) {
   if ((process.env.VERBOSE as string) === "true") {
@@ -10,7 +19,7 @@ export const log = function (message?: any, ...optionalParams: any[]) {
   }
 };
 
-export const checkIsFollowingFrameCasterAirstack = async function (
+const checkIsFollowingFrameCasterAirstackNoTimeout = async function (
   _fid: number
 ): Promise<Boolean> {
   const query = `query {
@@ -44,41 +53,28 @@ export const checkIsFollowingFrameCasterAirstack = async function (
   }
 };
 
-export const checkIsFollowingFrameCasterPinata = async function (
+const checkIsFollowingFrameCasterPinataNoTimeout = async function (
   _fid: number
 ): Promise<Boolean> {
   const authorFid = process.env.FID as string;
-  let loop = true;
-  let nextPageToken = "";
-  const pageSize = "50";
-
-  while (loop) {
+  try {
     const resp = await fetch(
-      `https://hub.pinata.cloud/v1/linksByTargetFid?target_fid=${_fid}&link_type=follow&pageSize=${pageSize}&reverse=true&nextPageToken=${nextPageToken}`,
+      `http://hub.pinata.cloud/v1/linkById?fid=${_fid}&target_fid=${authorFid}&link_type=follow`,
       { method: "GET" }
     );
-    // set next page token
-    const jresp = await resp.json();
 
-    // loop controller
-    if ((jresp.nextPageToken as string).length > 0) {
-      loop = true;
-      nextPageToken = jresp.nextPageToken as string;
-    } else {
-      // last page
-      loop = false;
+    if (resp.ok) {
+      const jresp: any = await resp.json();
+      return jresp.hash && jresp.hash.length > 2;
     }
-    // check if fid is in this list
-    for (const msg of jresp.messages) {
-      if (msg.data && msg.data.fid === authorFid) {
-        return true;
-      }
-    }
+    return false;
+  } catch (error) {
+    console.log("checkIsFollowingFrameCasterPinata error:", error);
+    return false;
   }
-  return false;
 };
 
-export const checkIfRecasted = async function (
+const checkIfRecastedNoTimeout = async function (
   recaster_fid: number,
   cast_hash: string
 ): Promise<Boolean> {
@@ -98,7 +94,7 @@ export const checkIfRecasted = async function (
   return response.ok;
 };
 
-export const getWalletAddresses = async function (_fid: number) {
+const getWalletAddressesNoTimeout = async function (_fid: number) {
   const query = `query {
         Socials(
           input: {filter: {userId: {_eq: "${_fid}"}, dappName: {_eq: farcaster}}, blockchain: ethereum}
@@ -133,6 +129,47 @@ export const getWalletAddresses = async function (_fid: number) {
   } else {
     throw new Error(`E3. User not found (fid = ${_fid}).`);
   }
+};
+
+export const checkIsFollowingFrameCasterAirstack = async function (
+  _fid: number,
+  timeout = 1000
+): Promise<Boolean> {
+  return Promise.race([
+    timeoutHandler<Boolean>(timeout, true),
+    checkIsFollowingFrameCasterAirstackNoTimeout(_fid),
+  ]);
+};
+
+export const checkIsFollowingFrameCasterPinata = async function (
+  _fid: number,
+  timeout = 1000
+): Promise<Boolean> {
+  return Promise.race([
+    timeoutHandler<Boolean>(timeout, true),
+    checkIsFollowingFrameCasterPinataNoTimeout(_fid),
+  ]);
+};
+
+export const checkIfRecasted = async function (
+  recaster_fid: number,
+  cast_hash: string,
+  timeout = 1000
+): Promise<Boolean> {
+  return Promise.race([
+    timeoutHandler(timeout, false),
+    checkIfRecastedNoTimeout(recaster_fid, cast_hash),
+  ]);
+};
+
+export const getWalletAddresses = async function (
+  _fid: number,
+  timeout = 1000
+) {
+  return Promise.race([
+    timeoutHandler(timeout, []),
+    getWalletAddressesNoTimeout(_fid),
+  ]);
 };
 
 export const isToday = function (lastClaimTimestamp: number): Boolean {
