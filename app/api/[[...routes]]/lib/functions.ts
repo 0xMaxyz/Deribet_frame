@@ -174,7 +174,7 @@ export const getWalletAddresses = async function (
 
 export const isToday = function (lastClaimTimestamp: number): Boolean {
   const today = new Date();
-  const timestampDate = new Date(lastClaimTimestamp * 1000);
+  const timestampDate = new Date(lastClaimTimestamp);
 
   return (
     timestampDate.getDate() === today.getDate() &&
