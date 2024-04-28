@@ -91,9 +91,7 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
   image: <img src="/frame-daily-allocation-yes.png" />,
-  intents: [
-    <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
-  ],
+  intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
 
