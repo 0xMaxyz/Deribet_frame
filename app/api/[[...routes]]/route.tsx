@@ -9,6 +9,7 @@ import {
   createTable,
   getLatestTxHashForAUser,
   getLatestTxTimestampForAUser,
+  getNumberofTxToday,
   setClaimTimestamp,
 } from "./lib/db";
 import { pinata } from "frog/hubs";
@@ -90,7 +91,18 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
   image: <img src="/frame-daily-allocation-yes.png" />,
-  intents: [<Button action="/claim">Claim</Button>],
+  intents: [
+    <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
+  ],
+  title: "Check Tomorrow!",
+};
+
+const capacityLimitResponse: FrameResponse = {
+  browserLocation: "/",
+  image: <img src="/frame-capacity-reached.png" />,
+  intents: [
+    <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
+  ],
   title: "You're In!",
 };
 
@@ -114,7 +126,13 @@ const txSuccessfulResponse = function (
 
 app.frame("/", async (c) => {
   await createTable();
-  return c.res(welcomeResponse);
+  // Check max claim per day
+  const maxClaimToday = await getNumberofTxToday();
+  if (maxClaimToday < Number(process.env.MAX_CLAIM_PER_DAY as string)) {
+    return c.res(welcomeResponse);
+  } else {
+    return c.res(capacityLimitResponse);
+  }
 });
 
 app.frame("/check", async (c) => {
@@ -213,35 +231,42 @@ app.frame("/claim", async (c) => {
     frameData?.fid as number,
     wallets[0]
   );
-  if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
-    // User can claim tokens now, send the amount to user's wallet
-    const txHash = await transferToken(wallets[0] as `0x${string}`);
-    if (txHash.length > 2) {
-      const token =
-        isTesting === "true"
-          ? (process.env.TEST_TOKEN_ADDRESS as string)
-          : (process.env.TOKEN_ADDRESS as string);
-      // Successful transfer, update database
-      setClaimTimestamp(
-        frameData?.fid as number,
-        wallets[0],
-        new Date().toISOString(),
-        token,
-        process.env.ALLOCATION_AMOUNT as string,
-        txHash
-      );
+  // Check max claims for today
+  const maxClaimToday = await getNumberofTxToday();
 
-      response = txSuccessfulResponse(wallets[0], token);
+  if (maxClaimToday < Number(process.env.MAX_CLAIM_PER_DAY as string)) {
+    if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+      // User can claim tokens now, send the amount to user's wallet
+      const txHash = await transferToken(wallets[0] as `0x${string}`);
+      if (txHash.length > 2) {
+        const token =
+          isTesting === "true"
+            ? (process.env.TEST_TOKEN_ADDRESS as string)
+            : (process.env.TOKEN_ADDRESS as string);
+        // Successful transfer, update database
+        setClaimTimestamp(
+          frameData?.fid as number,
+          wallets[0],
+          new Date().toISOString(),
+          token,
+          process.env.ALLOCATION_AMOUNT as string,
+          txHash
+        );
+
+        response = txSuccessfulResponse(wallets[0], token);
+      } else {
+        const tx_hash: string = await getLatestTxHashForAUser(
+          frameData?.fid as number,
+          wallets[0]
+        );
+        response = noAllocationResponse(tx_hash);
+      }
     } else {
-      const tx_hash: string = await getLatestTxHashForAUser(
-        frameData?.fid as number,
-        wallets[0]
-      );
-      response = noAllocationResponse(tx_hash);
+      // something went wrong
+      response = errorResponse;
     }
   } else {
-    // something went wrong
-    response = errorResponse;
+    response = capacityLimitResponse;
   }
 
   return c.res(response);

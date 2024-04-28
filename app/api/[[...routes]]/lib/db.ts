@@ -75,3 +75,13 @@ export const setClaimTimestamp = async function (
 
   log("Inserted Data: ", result);
 };
+
+export const getNumberofTxToday = async function () {
+  const resp = await sql`
+  SELECT COUNT(*) AS tx
+  FROM Allocations
+  WHERE DATE_TRUNC('day', timestamp) = CURRENT_DATE;
+  `;
+  log("Number of tx today:", resp.rows[0]);
+  return (resp.rows[0]?.tx as number) ?? 0;
+};
