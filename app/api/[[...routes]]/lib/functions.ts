@@ -120,9 +120,14 @@ const getWalletAddressesNoTimeout = async function (_fid: number) {
       Array.isArray(data.Socials.Social[0].userAssociatedAddresses) &&
       data.Socials.Social[0].userAssociatedAddresses.length >= 1
     ) {
-      return (
+      const wallets = (
         data.Socials.Social[0].userAssociatedAddresses as Array<string>
-      ).slice(1);
+      )
+        .slice(1)
+        .filter((x) => x.startsWith("0x"));
+      // Log found wallets
+      log("EVM Wallets: ", wallets.join(", "));
+      return wallets;
     } else {
       throw new Error(`E2. No wallet found for fid = ${_fid}`);
     }
@@ -193,4 +198,19 @@ export const getTxhashOnExplorer = function (txHash: string): string {
     addr += "/";
   }
   return addr + `tx/${txHash}`;
+};
+
+export const getfilteredResultsOnExplorer = function (
+  wallet: string,
+  token: string
+): string {
+  let addr =
+    (process.env.TESTING as string) === "true"
+      ? (process.env.BASE_SEPOLIA_EXPLORER as string)
+      : (process.env.BASE_MAINNET_EXPLORER as string);
+
+  if (!addr.endsWith("/")) {
+    addr += "/";
+  }
+  return addr + `token/${token}?a=${wallet}`;
 };

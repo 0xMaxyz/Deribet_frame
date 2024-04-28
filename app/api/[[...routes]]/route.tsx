@@ -20,6 +20,7 @@ import {
   checkIsFollowingFrameCasterPinata,
   getTxhashOnExplorer,
   getWalletAddresses,
+  getfilteredResultsOnExplorer,
   isToday,
   log,
 } from "./lib/functions";
@@ -70,7 +71,7 @@ const errorResponse: FrameResponse = {
   browserLocation: "/",
   image: <img src="/frame-error.png" />,
   intents: [<Button.Reset>Reset</Button.Reset>],
-  title: "Error",
+  title: "Nooo! What Happened!",
 };
 
 const noAllocationResponse = function (_txHash: string): FrameResponse {
@@ -82,7 +83,7 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
         Check on Explorer
       </Button.Link>,
     ],
-    title: "Error",
+    title: "Sorry!",
   };
 };
 
@@ -90,14 +91,23 @@ const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
   image: <img src="/frame-daily-allocation-yes.png" />,
   intents: [<Button action="/claim">Claim</Button>],
-  title: "Error",
+  title: "You're In!",
 };
 
-const txSuccessfulResponse: FrameResponse = {
-  browserLocation: "/",
-  image: <img src="/frame-tx-succesfull.png" />,
-  intents: [<Button.Link href="https://docs.deribet.io/">Info</Button.Link>],
-  title: "Error",
+const txSuccessfulResponse = function (
+  wallet: string,
+  token: string
+): FrameResponse {
+  return {
+    browserLocation: "/",
+    image: <img src="/frame-tx-succesfull.png" />,
+    intents: [
+      <Button.Link href={getfilteredResultsOnExplorer(wallet, token)}>
+        Check on Explorer
+      </Button.Link>,
+    ],
+    title: "Successful",
+  };
 };
 
 ///
@@ -207,19 +217,21 @@ app.frame("/claim", async (c) => {
     // User can claim tokens now, send the amount to user's wallet
     const txHash = await transferToken(wallets[0] as `0x${string}`);
     if (txHash.length > 2) {
+      const token =
+        isTesting === "true"
+          ? (process.env.TEST_TOKEN_ADDRESS as string)
+          : (process.env.TOKEN_ADDRESS as string);
       // Successful transfer, update database
       setClaimTimestamp(
         frameData?.fid as number,
         wallets[0],
         new Date().toISOString(),
-        isTesting === "true"
-          ? (process.env.TEST_TOKEN_ADDRESS as string)
-          : (process.env.TOKEN_ADDRESS as string),
+        token,
         process.env.ALLOCATION_AMOUNT as string,
         txHash
       );
 
-      response = txSuccessfulResponse;
+      response = txSuccessfulResponse(wallets[0], token);
     } else {
       const tx_hash: string = await getLatestTxHashForAUser(
         frameData?.fid as number,
