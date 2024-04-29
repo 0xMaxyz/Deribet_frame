@@ -43,14 +43,14 @@ const app = new Frog({
 
 const noWalletResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-no-wallet.png" />,
+  image: <img src={process.env.CDN + "frame-no-wallet.png"} />,
   intents: [<Button action="/follow">Follow</Button>],
   title: "Deribet",
 };
 
 const notFollowingResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-no-follow.png" />,
+  image: <img src={process.env.CDN + "frame-no-follow.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
     <Button action="/check">Check</Button>,
@@ -59,7 +59,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src="/frame-welcome_test.png" />,
+  image: <img src={process.env.CDN + "frame-welcome_test.png"} />,
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
@@ -70,7 +70,7 @@ const welcomeResponse: FrameResponse = {
 
 const errorResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-error.png" />,
+  image: <img src={process.env.CDN + "frame-error.png"} />,
   intents: [<Button.Reset>Reset</Button.Reset>],
   title: "Nooo! What Happened!",
 };
@@ -78,7 +78,7 @@ const errorResponse: FrameResponse = {
 const noAllocationResponse = function (_txHash: string): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src="/frame-daily-allocation-no.png" />,
+    image: <img src={process.env.CDN + "frame-daily-allocation-no.png"} />,
     intents: [
       <Button.Link href={getTxhashOnExplorer(_txHash)}>
         Check on Explorer
@@ -90,14 +90,14 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-daily-allocation-yes.png" />,
+  image: <img src={process.env.CDN + "frame-daily-allocation-yes.png"} />,
   intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
 
 const capacityLimitResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-capacity-reached.png" />,
+  image: <img src={process.env.CDN + "frame-capacity-reached.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
   ],
@@ -110,7 +110,7 @@ const txSuccessfulResponse = function (
 ): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src="/frame-tx-succesfull.png" />,
+    image: <img src={process.env.CDN + "frame-tx-succesfull.png"} />,
     intents: [
       <Button.Link href={getfilteredResultsOnExplorer(wallet, token)}>
         Check on Explorer
