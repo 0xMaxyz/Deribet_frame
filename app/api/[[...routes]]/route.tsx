@@ -59,7 +59,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src={process.env.CDN + "frame-welcome_test.png"} />,
+  image: <img src={process.env.CDN + "frame-web.png"} />,
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
