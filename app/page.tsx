@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <main className={styles.main}>
-      <img src={process.env.CDN + "frame-web.png"} />
+      <img src={process.env.CDN + "frame-welcome-degen.png"} />
 
       <Link
         style={{
@@ -26,7 +26,7 @@ export default function Home() {
         }}
         href="https://docs.deribet.io/"
       >
-        More Info 🡕
+        More Info 👇
       </Link>
     </main>
   );
