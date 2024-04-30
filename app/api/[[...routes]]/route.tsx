@@ -63,7 +63,7 @@ const welcomeResponse: FrameResponse = {
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
-    <Button action="/check">Check</Button>,
+    <Button action="/check">Claim</Button>,
   ],
   title: "Check",
 };
