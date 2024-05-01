@@ -59,7 +59,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src={process.env.CDN + "frame-welcome-degen.png"} />,
+  image: <img src={process.env.CDN + "frame-welcome-degen-1.png"} />,
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
@@ -90,7 +90,7 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-daily-allocation-yes-degen.png"} />,
+  image: <img src={process.env.CDN + "frame-daily-allocation-yes-degen-1.png"} />,
   intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
