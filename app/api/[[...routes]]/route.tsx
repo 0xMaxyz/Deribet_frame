@@ -24,7 +24,6 @@ import {
   getfilteredResultsOnExplorer,
   isToday,
   log,
-  isWithinLast30Days,
 } from "./lib/functions";
 import { transferToken } from "./lib/onchain";
 
@@ -195,12 +194,7 @@ app.frame("/check", async (c) => {
         frameData?.fid as number,
         wallets[0]
       );
-
-      // CHECK IF TODAY
-      // if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
-
-      // CHECK IF LAST 30 days
-      if (!lastTimestamp || !isWithinLast30Days(new Date(lastTimestamp).getTime())) {
+      if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
         // User can claim tokens now
         response = dailyAllocationAvailableResponse;
       } else {

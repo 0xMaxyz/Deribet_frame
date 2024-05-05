@@ -24,8 +24,9 @@ const checkIsFollowingFrameCasterAirstackNoTimeout = async function (
 ): Promise<Boolean> {
   const query = `query {
         SocialFollowers(
-          input: {filter: {dappName: {_eq: farcaster}, followerProfileId: {_eq: "${_fid}"}, followingProfileId: {_eq: "${process.env.FID as string
-    }"}}, blockchain: ALL}
+          input: {filter: {dappName: {_eq: farcaster}, followerProfileId: {_eq: "${_fid}"}, followingProfileId: {_eq: "${
+    process.env.FID as string
+  }"}}, blockchain: ALL}
         ) {
           Follower {
             followerProfileId
@@ -78,8 +79,9 @@ const checkIfRecastedNoTimeout = async function (
   cast_hash: string
 ): Promise<Boolean> {
   const server = process.env.AIRSTACK_HUB as string;
-  const url = `${server}/reactionById?fid=${recaster_fid}&reaction_type=2&target_fid=${process.env.FID as string
-    }&target_hash=${cast_hash}`;
+  const url = `${server}/reactionById?fid=${recaster_fid}&reaction_type=2&target_fid=${
+    process.env.FID as string
+  }&target_hash=${cast_hash}`;
   const headers = {
     "Content-Type": "application/json",
     "x-airstack-hubs": process.env.AIRSTACK_API_KEY as string,
@@ -184,14 +186,6 @@ export const isToday = function (lastClaimTimestamp: number): Boolean {
     timestampDate.getMonth() === today.getMonth() &&
     timestampDate.getFullYear() === today.getFullYear()
   );
-};
-
-export const isWithinLast30Days = function (lastClaimTimestamp: number): boolean {
-  const today = new Date();
-  const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
-  const timestampDate = new Date(lastClaimTimestamp);
-
-  return timestampDate >= thirtyDaysAgo;
 };
 
 export const getTxhashOnExplorer = function (txHash: string): string {
