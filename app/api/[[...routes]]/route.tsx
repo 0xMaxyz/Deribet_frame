@@ -23,6 +23,7 @@ import {
   getWalletAddresses,
   getfilteredResultsOnExplorer,
   isToday,
+  isWithinLast30Days,
   log,
 } from "./lib/functions";
 import { transferToken } from "./lib/onchain";
@@ -194,7 +195,13 @@ app.frame("/check", async (c) => {
         frameData?.fid as number,
         wallets[0]
       );
-      if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+
+      // CHECK FOR DAILY ALLOCATION
+      // if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+
+      // CHECK FOR MONTHLY ALLOCATION
+      if (!lastTimestamp || !isWithinLast30Days(new Date(lastTimestamp).getTime())) {
+
         // User can claim tokens now
         response = dailyAllocationAvailableResponse;
       } else {
