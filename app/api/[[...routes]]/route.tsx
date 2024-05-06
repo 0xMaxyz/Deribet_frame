@@ -51,7 +51,7 @@ const noWalletResponse: FrameResponse = {
 
 const notFollowingResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-no-follow-degen-2.png"} />,
+  image: <img src={process.env.CDN + "frame-no-follow-brett.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
     <Button action="/check">Check</Button>,
@@ -60,7 +60,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src={process.env.CDN + "frame-welcome-degen-2.png"} />,
+  image: <img src={process.env.CDN + "frame-welcome-brett.png"} />,
   intents: [
     <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
@@ -79,7 +79,7 @@ const errorResponse: FrameResponse = {
 const noAllocationResponse = function (_txHash: string): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src={process.env.CDN + "frame-daily-allocation-no-degen-2.png"} />,
+    image: <img src={process.env.CDN + "frame-daily-allocation-no-brett.png"} />,
     intents: [
       <Button.Link href={getTxhashOnExplorer(_txHash)}>
         Check on Explorer
@@ -91,7 +91,7 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-daily-allocation-yes-degen-2.png"} />,
+  image: <img src={process.env.CDN + "frame-daily-allocation-yes-brett.png"} />,
   intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
@@ -111,7 +111,7 @@ const txSuccessfulResponse = function (
 ): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src={process.env.CDN + "frame-tx-succesfull-degen.png"} />,
+    image: <img src={process.env.CDN + "frame-tx-succesfull-brett.png"} />,
     intents: [
       <Button.Link href={getfilteredResultsOnExplorer(wallet, token)}>
         Check on Explorer
