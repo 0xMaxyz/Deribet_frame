@@ -71,7 +71,7 @@ const welcomeResponse: FrameResponse = {
 
 const errorResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-error.png"} />,
+  image: <img src={process.env.CDN + "frame-error-1.png"} />,
   intents: [<Button.Reset>Reset</Button.Reset>],
   title: "Nooo! What Happened!",
 };
