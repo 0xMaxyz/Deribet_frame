@@ -246,7 +246,7 @@ app.frame("/claim", async (c) => {
         // User can claim tokens now, send the amount to user's wallet
 
         const txHash = await transferToken(wallets[0] as `0x${string}`);
-        if (txHash.length > 2) {
+        if (txHash && txHash.length > 2) {
           const token =
             isTesting === "true"
               ? (process.env.TEST_TOKEN_ADDRESS as string)
