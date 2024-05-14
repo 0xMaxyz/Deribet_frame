@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <main className={styles.main}>
-      <img src={process.env.CDN + "frame-welcome-brett.png"} />
+      <img src={process.env.CDN + "frame-welcome-dbdegen.png"} />
 
       <Link
         style={{

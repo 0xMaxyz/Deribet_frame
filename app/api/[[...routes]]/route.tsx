@@ -51,7 +51,7 @@ const noWalletResponse: FrameResponse = {
 
 const notFollowingResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-no-follow-brett.png"} />,
+  image: <img src={process.env.CDN + "frame-no-follow-dbdegen.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
     <Button action="/check">Check</Button>,
@@ -60,7 +60,7 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src={process.env.CDN + "frame-welcome-brett.png"} />,
+  image: <img src={process.env.CDN + "frame-welcome-dbdegen.png"} />,
   intents: [
     <Button.Link href="https://docs.deribet.io/overview/deribet-iou-tokens">How Tokens Work</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
@@ -71,7 +71,7 @@ const welcomeResponse: FrameResponse = {
 
 const errorResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-error-1.png"} />,
+  image: <img src={process.env.CDN + "frame-error-dbdegen.png"} />,
   intents: [<Button.Reset>Reset</Button.Reset>],
   title: "Nooo! What Happened!",
 };
@@ -79,7 +79,7 @@ const errorResponse: FrameResponse = {
 const noAllocationResponse = function (_txHash: string): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src={process.env.CDN + "frame-daily-allocation-no-brett.png"} />,
+    image: <img src={process.env.CDN + "frame-daily-allocation-no-dbdegen.png"} />,
     intents: [
       <Button.Link href={getTxhashOnExplorer(_txHash)}>
         Check on Explorer
@@ -91,14 +91,14 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-daily-allocation-yes-brett.png"} />,
+  image: <img src={process.env.CDN + "frame-daily-allocation-yes-dbdegen.png"} />,
   intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
 
 const capacityLimitResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src={process.env.CDN + "frame-capacity-reached-degen-2.png"} />,
+  image: <img src={process.env.CDN + "frame-capacity-reached-dbdegen.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
   ],
@@ -111,7 +111,7 @@ const txSuccessfulResponse = function (
 ): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src={process.env.CDN + "frame-tx-succesfull-brett.png"} />,
+    image: <img src={process.env.CDN + "frame-tx-succesfull-dbdegen.png"} />,
     intents: [
       <Button.Link href={getfilteredResultsOnExplorer(wallet, token)}>
         Check on Explorer
@@ -262,7 +262,13 @@ app.frame("/claim", async (c) => {
           );
 
           response = txSuccessfulResponse(wallets[0], token);
-        } else {
+        }
+        // Return error response only if txHash is undefined
+        if (txHash === undefined) {
+          response = errorResponse;
+        }
+
+        else {
           const tx_hash: string = await getLatestTxHashForAUser(
             frameData?.fid as number,
             wallets[0]
