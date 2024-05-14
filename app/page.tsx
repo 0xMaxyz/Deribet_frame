@@ -24,9 +24,9 @@ export default function Home() {
           marginTop: "40px",
           textDecoration: "underline",
         }}
-        href="https://docs.deribet.io/"
+        href="https://docs.deribet.io/overview/deribet-iou-tokens"
       >
-        More Info 👇
+        How it works👇
       </Link>
     </main>
   );
