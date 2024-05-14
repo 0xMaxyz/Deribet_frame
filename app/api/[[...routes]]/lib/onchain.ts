@@ -52,7 +52,9 @@ export const transferToken = async function (
   const balance = await publicClient.getBalance({ address: wallet as Address });
   const minBalance = 4e15; // Minimum balance of 0.0004 ETH (in wei)
   if (balance < minBalance) {
-    console.warn(`Skipping address ${wallet}, balance below minimum (0.0004 ETH)`);
+    log(`Skipping address ${wallet}, balance below minimum (0.0004 ETH)`);
+    return undefined;
+  } else {
 
     const data = encodeFunctionData({
       abi,
@@ -69,6 +71,4 @@ export const transferToken = async function (
     log(`Wallet address is ${wallet}, tx hash is ${txHash}`);
     return txHash;
   }
-  log(`Wallet address is ${wallet} and has no minium balanace of 0.0004 ETH`);
-  return undefined; // Explicitly return undefined if balance is not below minimum
 };
