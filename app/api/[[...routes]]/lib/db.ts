@@ -8,13 +8,15 @@ export const createTable = async function () {
     timestamp TIMESTAMP NOT NULL,
     wallet_address varchar(42) NOT NULL,
     fid TEXT NOT NULL,
-    amount_redeemed TEXT NOT NULL,
+    amount_redeemed NUMERIC(8,4) NOT NULL,
     tx_hash varchar(66) NOT NULL,
     token_address varchar(42) NOT NULL
   );
   `;
   log(result);
 };
+
+//     amount_redeemed INTEGER NOT NULL,
 
 const getLatestRowForAUser = async function (_fid: number, _wallet: string) {
   return await sql`

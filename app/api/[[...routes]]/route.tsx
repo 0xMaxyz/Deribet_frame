@@ -23,6 +23,7 @@ import {
   getWalletAddresses,
   getfilteredResultsOnExplorer,
   isToday,
+  isWithinLast30Days,
   log,
 } from "./lib/functions";
 import { transferToken } from "./lib/onchain";
@@ -43,14 +44,14 @@ const app = new Frog({
 
 const noWalletResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-no-wallet.png" />,
+  image: <img src={process.env.CDN + "frame-no-wallet.png"} />,
   intents: [<Button action="/follow">Follow</Button>],
   title: "Deribet",
 };
 
 const notFollowingResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-no-follow.png" />,
+  image: <img src={process.env.CDN + "frame-no-follow-dbdegen.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
     <Button action="/check">Check</Button>,
@@ -59,18 +60,18 @@ const notFollowingResponse: FrameResponse = {
 };
 
 const welcomeResponse: FrameResponse = {
-  image: <img src="/frame-welcome_test.png" />,
+  image: <img src={process.env.CDN + "frame-welcome-dbdegen.png"} />,
   intents: [
-    <Button.Link href="https://docs.deribet.io/">Info</Button.Link>,
+    <Button.Link href="https://docs.deribet.io/overview/deribet-iou-tokens">How Tokens Work</Button.Link>,
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
-    <Button action="/check">Check</Button>,
+    <Button action="/check">Claim</Button>,
   ],
   title: "Check",
 };
 
 const errorResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-error.png" />,
+  image: <img src={process.env.CDN + "frame-error-dbdegen.png"} />,
   intents: [<Button.Reset>Reset</Button.Reset>],
   title: "Nooo! What Happened!",
 };
@@ -78,7 +79,7 @@ const errorResponse: FrameResponse = {
 const noAllocationResponse = function (_txHash: string): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src="/frame-daily-allocation-no.png" />,
+    image: <img src={process.env.CDN + "frame-daily-allocation-no-dbdegen.png"} />,
     intents: [
       <Button.Link href={getTxhashOnExplorer(_txHash)}>
         Check on Explorer
@@ -90,14 +91,14 @@ const noAllocationResponse = function (_txHash: string): FrameResponse {
 
 const dailyAllocationAvailableResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-daily-allocation-yes.png" />,
+  image: <img src={process.env.CDN + "frame-daily-allocation-yes-dbdegen.png"} />,
   intents: [<Button action="/claim">Claim</Button>],
   title: "Check Tomorrow!",
 };
 
 const capacityLimitResponse: FrameResponse = {
   browserLocation: "/",
-  image: <img src="/frame-capacity-reached.png" />,
+  image: <img src={process.env.CDN + "frame-capacity-reached-dbdegen.png"} />,
   intents: [
     <Button.Link href={process.env.PROFILE as string}>Follow</Button.Link>,
   ],
@@ -110,7 +111,7 @@ const txSuccessfulResponse = function (
 ): FrameResponse {
   return {
     browserLocation: "/",
-    image: <img src="/frame-tx-succesfull.png" />,
+    image: <img src={process.env.CDN + "frame-tx-succesfull-dbdegen.png"} />,
     intents: [
       <Button.Link href={getfilteredResultsOnExplorer(wallet, token)}>
         Check on Explorer
@@ -194,7 +195,13 @@ app.frame("/check", async (c) => {
         frameData?.fid as number,
         wallets[0]
       );
-      if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+
+      // CHECK FOR DAILY ALLOCATION
+      // if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+
+      // CHECK FOR MONTHLY ALLOCATION
+      if (!lastTimestamp || !isWithinLast30Days(new Date(lastTimestamp).getTime())) {
+
         // User can claim tokens now
         response = dailyAllocationAvailableResponse;
       } else {
@@ -222,51 +229,62 @@ app.frame("/check", async (c) => {
 app.frame("/claim", async (c) => {
   const { frameData } = c;
   let response: FrameResponse = { image: "" };
-  // Get wallet
-  const wallets = await getWalletAddresses(frameData?.fid as number);
-  // Check if user can claim token today
-  const lastTimestamp = await getLatestTxTimestampForAUser(
-    frameData?.fid as number,
-    wallets[0]
-  );
-  // Check max claims for today
-  const maxClaimToday = await getNumberofTxToday();
 
-  if (maxClaimToday < Number(process.env.MAX_CLAIM_PER_DAY as string)) {
-    if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
-      // User can claim tokens now, send the amount to user's wallet
-      const txHash = await transferToken(wallets[0] as `0x${string}`);
-      if (txHash.length > 2) {
-        const token =
-          isTesting === "true"
-            ? (process.env.TEST_TOKEN_ADDRESS as string)
-            : (process.env.TOKEN_ADDRESS as string);
-        // Successful transfer, update database
-        setClaimTimestamp(
-          frameData?.fid as number,
-          wallets[0],
-          new Date().toISOString(),
-          token,
-          process.env.ALLOCATION_AMOUNT as string,
-          txHash
-        );
+  try {
+    // Get wallet
+    const wallets = await getWalletAddresses(frameData?.fid as number);
+    // Check if user can claim token today
+    const lastTimestamp = await getLatestTxTimestampForAUser(
+      frameData?.fid as number,
+      wallets[0]
+    );
+    // Check max claims for today
+    const maxClaimToday = await getNumberofTxToday();
 
-        response = txSuccessfulResponse(wallets[0], token);
+    if (maxClaimToday < Number(process.env.MAX_CLAIM_PER_DAY as string)) {
+      if (!lastTimestamp || !isToday(new Date(lastTimestamp).getTime())) {
+        // User can claim tokens now, send the amount to user's wallet
+
+        const txHash = await transferToken(wallets[0] as `0x${string}`);
+        if (txHash && txHash.length > 2) {
+          const token =
+            isTesting === "true"
+              ? (process.env.TEST_TOKEN_ADDRESS as string)
+              : (process.env.TOKEN_ADDRESS as string);
+          // Successful transfer, update database
+          setClaimTimestamp(
+            frameData?.fid as number,
+            wallets[0],
+            new Date().toISOString(),
+            token,
+            process.env.ALLOCATION_AMOUNT as string,
+            txHash
+          );
+
+          response = txSuccessfulResponse(wallets[0], token);
+        }
+        // Return error response only if txHash is undefined
+        if (txHash === undefined) {
+          response = errorResponse;
+        }
+
+        else {
+          const tx_hash: string = await getLatestTxHashForAUser(
+            frameData?.fid as number,
+            wallets[0]
+          );
+          response = noAllocationResponse(tx_hash);
+        }
       } else {
-        const tx_hash: string = await getLatestTxHashForAUser(
-          frameData?.fid as number,
-          wallets[0]
-        );
-        response = noAllocationResponse(tx_hash);
+        // something went wrong
+        response = errorResponse;
       }
     } else {
-      // something went wrong
-      response = errorResponse;
+      response = capacityLimitResponse;
     }
-  } else {
-    response = capacityLimitResponse;
+  } catch (error) {
+    response = errorResponse;
   }
-
   return c.res(response);
 });
 

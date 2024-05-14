@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import {
   parseUnits,
   createWalletClient,
+  createPublicClient,
   http,
   getContract,
   parseEther,
@@ -31,26 +32,43 @@ const client = createWalletClient({
   ),
 });
 
+export const publicClient = createPublicClient({
+  chain: base,
+  transport: http(
+    isTesting === "true"
+      ? (process.env.BASE_SEPOLIA_RPC as string)
+      : (process.env.BASE_MAINNET_RPC as string)
+  ),
+})
+
 export const transferToken = async function (
   wallet: Address
-): Promise<`0x${string}`> {
+): Promise<`0x${string}` | undefined> {
   const tokenAddress =
     isTesting === "true"
       ? (process.env.TEST_TOKEN_ADDRESS as `0x${string}`)
       : (process.env.TOKEN_ADDRESS as `0x${string}`);
 
-  const data = encodeFunctionData({
-    abi,
-    functionName: "transfer",
-    args: [wallet, parseEther(process.env.ALLOCATION_AMOUNT as string)],
-  });
+  const balance = await publicClient.getBalance({ address: wallet as Address });
+  const minBalance = 4e15; // Minimum balance of 0.0004 ETH (in wei)
+  if (balance < minBalance) {
+    log(`Skipping address ${wallet}, balance below minimum (0.0004 ETH)`);
+    return undefined;
+  } else {
 
-  const txHash = await client.sendTransaction({
-    account: vault,
-    to: tokenAddress,
-    data: data,
-    maxFeePerGas: parseUnits(process.env.MAX_FEE_PER_GAS as string, 9),
-  });
-  log(`Wallet address is ${wallet}, tx hash is ${txHash}`);
-  return txHash;
+    const data = encodeFunctionData({
+      abi,
+      functionName: "transfer",
+      args: [wallet, parseEther(process.env.ALLOCATION_AMOUNT as string)],
+    });
+
+    const txHash = await client.sendTransaction({
+      account: vault,
+      to: tokenAddress,
+      data: data,
+      maxFeePerGas: parseUnits(process.env.MAX_FEE_PER_GAS as string, 9),
+    });
+    log(`Wallet address is ${wallet}, tx hash is ${txHash}`);
+    return txHash;
+  }
 };
